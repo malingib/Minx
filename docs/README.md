@@ -21,3 +21,7 @@ This directory is the platform's technical source of truth. Start with the [appr
 
 ## Change control
 Changes to approved technology choices or service boundaries require a superseding ADR. External legal, procurement, regional availability and performance gates must be evidenced before production release.
+
+## UI/UX
+- [Design system](ui-ux/design-system.md) — design principles, navigation, tokens, components, accessibility and interaction standards.
+- [Mobile screen map](ui-ux/mobile-screen-map.md) — full screen inventory, journeys and P0/P1/P2 prioritisation.
