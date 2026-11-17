@@ -31,12 +31,12 @@ Targets must be segmented by geography, device class, network profile and provid
 
 Use synthetic, privacy-safe data with production-shaped cardinality and skew. Publish the exact workload profile with each test.
 
-- Accounts: 100k baseline, then 1M and 10M scale projections.
+- Accounts: 10k funded pilot baseline; test 25k and 100k as later growth projections, not as launch commitments.
 - Profiles: model multiple profiles per account and creator/merchant organisations.
 - Social graph: skewed creator-follow distributions; include high-fanout accounts.
 - Feed: mixed read/write workload, pagination, ranking projection misses and cold caches.
 - Messaging: one-to-one and group conversations, durable history, receipts and reconnect replay.
-- Live: small interactive rooms plus broadcast audiences; test chat, reactions, pinned products and moderator actions separately.
+- Live: funded pilot baseline is 2,500 broadcast viewer-hours/month and 150 peak concurrent broadcast viewers. Test small interactive rooms separately from broadcast audiences; test chat, reactions, pinned products and moderator actions separately.
 - Commerce: catalogue browsing, inventory contention, cart updates, checkout, callback duplication and order status.
 - Finance: concurrent payment intents, duplicate callbacks, reversals, refunds and payout state transitions.
 - Workers: outbox backlog, retries, poison messages, consumer restarts and replay.
@@ -71,11 +71,11 @@ Pass conditions:
 
 ### 4.3 Media and live shopping
 
-Test interactive rooms at 2, 5, 10 and 25 participants; broadcast audiences at 100, 500, 1,000, 5,000 and 10,000 viewers where provider plan and budget permit. Test hybrid interactive-stage/broadcast-relay handoff, weak uplink, packet loss, mobile background/foreground, device rotation, token expiry, stream interruption and provider webhook replay.
+Test interactive rooms at 2, 5 and 10 participants; test broadcast audiences at 50, 100, 150 and 300 viewers for the funded pilot and immediate headroom. Larger 500, 1,000, 5,000 and 10,000 viewer tests are later growth exercises and require separately approved provider spend. Test hybrid interactive-stage/broadcast-relay handoff, weak uplink, packet loss, mobile background/foreground, device rotation, token expiry, stream interruption and provider webhook replay.
 
 Capture join success, time to first frame, glass-to-glass latency, bitrate adaptation, packet loss, jitter, reconnect success, rebuffering, battery, data consumed per viewer-minute and total cost per viewer-minute.
 
-The proposed 500-viewer relay threshold is a configurable hypothesis. Choose the actual transition threshold only after comparing quality and cost across room sizes and geographies. Verify recording, retention, takedown and moderation paths during the test.
+The funded pilot target is 150 concurrent broadcast viewers. The earlier 500-viewer relay threshold remains a later-stage hypothesis, not a KES 2.5M launch commitment. Choose any interactive-to-broadcast transition threshold only after comparing quality and cost across room sizes and geographies. Verify recording, retention, takedown and moderation paths during the test.
 
 ### 4.4 Finance and commerce correctness
 
@@ -141,7 +141,7 @@ Report cost in the units that map to product decisions:
 - Notifications: cost per 1,000 delivered notifications.
 - Observability: ingestion and retention cost per active user.
 
-For each test, report provider, region, service tier, committed spend, variable spend, egress, storage, peak usage and projected headroom. Include at least 30% operational headroom in initial capacity planning; revisit after measured traffic. No spend commitment until pricing, egress and minimum charges are confirmed.
+For each test, report provider, region, service tier, committed spend, variable spend, egress, storage, peak usage and projected headroom. Include at least 30% operational headroom in initial capacity planning; revisit after measured traffic. For the KES 2.5M / nine-month programme, the initial funded pilot is 10k registered users, 2.5k MAU planning target, 2.5k monthly broadcast viewer-hours and 150 peak concurrent broadcast viewers. The three-month beta budget is KES 650k, with KES 80k provisionally allocated to Cloudflare Stream and KES 20k to LiveKit Ship; the AWS KES 180k allowance remains a planning estimate pending a configuration-specific calculator export. No spend commitment until pricing, egress and minimum charges are confirmed.
 
 ## 7. Benchmark report template
 
