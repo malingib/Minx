@@ -18,6 +18,8 @@ This directory is the platform's technical source of truth. Start with the [appr
 - [External gates](operations/external-gates.md)
 - [Testing and release](quality/testing-release.md)
 - [Roadmap and acceptance](roadmap/acceptance.md)
+- [Funding, delivery and pilot capacity plan](roadmap/funding-capacity-delivery-plan.md)
+- [Performance benchmarks and capacity validation](operations/performance-benchmarks.md)
 
 ## Change control
 Changes to approved technology choices or service boundaries require a superseding ADR. External legal, procurement, regional availability and performance gates must be evidenced before production release.
