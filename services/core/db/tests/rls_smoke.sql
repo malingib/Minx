@@ -1,4 +1,4 @@
-\set ON_ERROR_STOP on
+\\set ON_ERROR_STOP on
 
 CREATE ROLE minx_app NOLOGIN;
 GRANT USAGE ON SCHEMA identity, profiles, organisations TO minx_app;
@@ -41,28 +41,53 @@ SET LOCAL minx.account_id = '10000000-0000-4000-8000-000000000002';
 INSERT INTO identity.accounts (id, auth_subject)
 VALUES ('10000000-0000-4000-8000-000000000002', 'issuer|subject-b');
 
-DO $
-BEGIN
-    BEGIN
-        INSERT INTO profiles.profiles (account_id, handle, display_name, profile_type, visibility)
-        VALUES ('10000000-0000-4000-8000-000000000001', 'spoofed_a', 'Spoofed', 'PERSONAL', 'PUBLIC');
-        RAISE EXCEPTION 'cross-account profile insert unexpectedly succeeded';
-    EXCEPTION WHEN insufficient_privilege THEN
-        NULL;
-    END;
-    IF (SELECT count(*) FROM profiles.profiles WHERE handle = 'creator_a') <> 1 THEN
-        RAISE EXCEPTION 'public profile should be visible to another account';
-    END IF;
-    IF (SELECT count(*) FROM profiles.profiles WHERE handle = 'private_a') <> 0 THEN
-        RAISE EXCEPTION 'private profile leaked across accounts';
-    END IF;
-    IF (SELECT count(*) FROM organisations.organisations WHERE id = '30000000-0000-4000-8000-000000000001') <> 0 THEN
-        RAISE EXCEPTION 'organisation leaked to non-member';
-    END IF;
-    IF (SELECT count(*) FROM identity.accounts WHERE id = '10000000-0000-4000-8000-000000000001') <> 0 THEN
-        RAISE EXCEPTION 'account row leaked across accounts';
-    END IF;
-END $check$;
+SAVEPOINT before_spoofed_profile;
+\set ON_ERROR_STOP off
+INSERT INTO profiles.profiles (account_id, handle, display_name, profile_type, visibility)
+VALUES ('10000000-0000-4000-8000-000000000001', 'spoofed_a', 'Spoofed', 'PERSONAL', 'PUBLIC');
+\if :ERROR
+  ROLLBACK TO SAVEPOINT before_spoofed_profile;
+  \echo 'PASS: cross-account profile insert rejected by RLS'
+\else
+  ROLLBACK TO SAVEPOINT before_spoofed_profile;
+  \echo 'FAIL: cross-account profile insert unexpectedly succeeded'
+  \quit 1
+\endif
+\set ON_ERROR_STOP on
+
+SELECT count(*) = 1 AS public_profile_visible
+FROM profiles.profiles WHERE handle = 'creator_a' \gset
+\if :public_profile_visible
+\else
+  \echo 'FAIL: public profile was not visible'
+  \quit 1
+\endif
+
+SELECT count(*) = 0 AS private_profile_hidden
+FROM profiles.profiles WHERE handle = 'private_a' \gset
+\if :private_profile_hidden
+\else
+  \echo 'FAIL: private profile leaked across accounts'
+  \quit 1
+\endif
+
+SELECT count(*) = 0 AS organisation_hidden
+FROM organisations.organisations
+WHERE id = '30000000-0000-4000-8000-000000000001' \gset
+\if :organisation_hidden
+\else
+  \echo 'FAIL: organisation leaked to a non-member'
+  \quit 1
+\endif
+
+SELECT count(*) = 0 AS account_hidden
+FROM identity.accounts
+WHERE id = '10000000-0000-4000-8000-000000000001' \gset
+\if :account_hidden
+\else
+  \echo 'FAIL: account row leaked across accounts'
+  \quit 1
+\endif
 
 ROLLBACK;
 RESET ROLE;
