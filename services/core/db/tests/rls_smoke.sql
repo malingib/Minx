@@ -1,4 +1,4 @@
-\\set ON_ERROR_STOP on
+\set ON_ERROR_STOP on
 
 CREATE ROLE minx_app NOLOGIN;
 GRANT USAGE ON SCHEMA identity, profiles, organisations TO minx_app;
