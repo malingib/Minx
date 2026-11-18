@@ -1,11 +1,14 @@
 package httpapi
 
 import (
+	"context"
 	"encoding/json"
 	"log/slog"
 	"net/http"
 	"time"
 )
+
+type ReadinessProbe func(context.Context) error
 
 type healthResponse struct {
 	Status    string    `json:"status"`
@@ -13,13 +16,22 @@ type healthResponse struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
-func NewRouter(logger *slog.Logger, serviceName string) http.Handler {
+func NewRouter(logger *slog.Logger, serviceName string, readiness ReadinessProbe) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health/live", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, healthResponse{Status: "ok", Service: serviceName, Timestamp: time.Now().UTC()})
 	})
 	mux.HandleFunc("GET /health/ready", func(w http.ResponseWriter, r *http.Request) {
-		// Dependency checks are added when the database and broker adapters are wired.
+		if readiness == nil {
+			writeJSON(w, http.StatusServiceUnavailable, healthResponse{Status: "not_ready", Service: serviceName, Timestamp: time.Now().UTC()})
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+		if err := readiness(ctx); err != nil {
+			writeJSON(w, http.StatusServiceUnavailable, healthResponse{Status: "not_ready", Service: serviceName, Timestamp: time.Now().UTC()})
+			return
+		}
 		writeJSON(w, http.StatusOK, healthResponse{Status: "ready", Service: serviceName, Timestamp: time.Now().UTC()})
 	})
 
