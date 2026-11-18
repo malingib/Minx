@@ -97,7 +97,7 @@ The launch allowance is a planning assumption, not a vendor-backed campaign budg
 
 Revenue consists of marketplace commission, Minx share of creator monetisation, merchant subscriptions and advertising. Costs include payment processing, media delivery/storage, staff, marketing, core infrastructure, support/moderation and G&A/legal/compliance.
 
-**Important reconciliation:** Year 1 marketplace GMV is KES 5.04M and the 5% commission is KES 252,000—not KES 2.52M. Year 2 commission is KES 1.26M; Year 3 is KES 4.86M. The detailed assumptions and formulas are documented in [the financial model](financial-model-36-month.md) and [monthly cash flow](monthly-base-case.csv).
+**Important reconciliation:** Year 1 marketplace GMV is KES 50.40M and the 5% commission is KES 2.52M. Year 2 marketplace GMV is KES 252.00M and commission is KES 12.60M; Year 3 marketplace GMV is KES 972.00M and commission is KES 48.60M. The detailed assumptions and formulas are documented in [the financial model](financial-model-36-month.md) and [monthly cash flow](monthly-base-case.csv).
 
 ## 9. Indicative funding bridge
 

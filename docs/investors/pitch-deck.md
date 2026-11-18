@@ -41,7 +41,7 @@ Marketplace commission, Minx share of creator monetisation, merchant subscriptio
 | Revenue | 6.204 | 33.720 | 135.720 |
 | Operating costs | 18.437 | 38.906 | 89.896 |
 | Operating surplus/(deficit) | (12.233) | (5.186) | 45.824 |
-A prior commission arithmetic error has been corrected: Year 1 commission is KES 0.252M, not KES 2.52M.
+Marketplace commission in the model is 5% of GMV: KES 2.52M in Year 1, KES 12.60M in Year 2 and KES 48.60M in Year 3.
 
 ## 11. Funding bridge
 Preliminary planning envelope: **KES 29.70M**, comprising KES 2.45M build/beta, KES 5M commercial launch, peak cumulative operating deficit and 20% working-capital reserve. This is not a firm raise amount until the monthly model is validated.
