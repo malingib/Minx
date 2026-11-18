@@ -55,6 +55,23 @@ jobs:
         run: |
           psql -h localhost -U postgres -d minx_test -v ON_ERROR_STOP=1 \
             -f services/core/db/tests/rls_smoke.sql
+      - name: Install sqlc
+        run: |
+          curl -fsSL https://github.com/sqlc-dev/sqlc/releases/download/v1.31.1/sqlc_1.31.1_linux_amd64.tar.gz -o /tmp/sqlc.tar.gz
+          echo '497ae4fcdfa64c5b0c311ffe4c2bd991e43991e82e5367792ed78bc2dca27354  /tmp/sqlc.tar.gz' | sha256sum --check
+          tar -xzf /tmp/sqlc.tar.gz -C /tmp sqlc
+          sudo install /tmp/sqlc /usr/local/bin/sqlc
+      - name: Generate Core database bindings
+        working-directory: services/core
+        run: sqlc generate
+      - name: Verify generated bindings are committed
+        run: git diff --exit-code -- services/core/internal/dbgen
+      - name: Upload generated Core bindings
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-sqlc-generated
+          path: services/core/internal/dbgen
+          if-no-files-found: error
       - name: Format check
         run: |
           test -z "$(gofmt -l services/core services/finance)"
