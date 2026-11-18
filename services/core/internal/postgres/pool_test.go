@@ -46,3 +46,12 @@ func TestInAccountTxRequiresCallback(t *testing.T) {
 		t.Fatalf("expected missing callback, got %v", err)
 	}
 }
+
+func TestInAccountTxValidatesUUIDBeforeRequiringPool(t *testing.T) {
+	err := InAccountTx(context.Background(), nil, "10000000-0000-4000-8000-000000000001", func(_ pgx.Tx) error {
+		return nil
+	})
+	if err == nil || err.Error() != "PostgreSQL pool is required" {
+		t.Fatalf("expected missing pool error after valid UUID, got %v", err)
+	}
+}
