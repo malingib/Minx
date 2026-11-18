@@ -14,7 +14,7 @@ VALUES ('10000000-0000-4000-8000-000000000001', 'issuer|subject-a');
 INSERT INTO profiles.profiles (id, account_id, handle, display_name, profile_type, visibility)
 VALUES
  ('20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'creator_a', 'Creator A', 'CREATOR', 'PUBLIC'),
- ('20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'private_a', 'Private A', 'PERSONAL', 'PRIVATE');
+ ('20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001', 'private_a', 'Private A', 'PERSONAL', 'PRIVATE');
 
 INSERT INTO organisations.organisations (
  id, display_name, organisation_type, country_code, created_by
