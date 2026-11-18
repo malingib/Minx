@@ -89,6 +89,8 @@ ALTER TABLE profiles.operators ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY accounts_self_read ON identity.accounts
     FOR SELECT USING (id = nullif(current_setting('minx.account_id', true), '')::uuid);
+CREATE POLICY accounts_self_insert ON identity.accounts
+    FOR INSERT WITH CHECK (id = nullif(current_setting('minx.account_id', true), '')::uuid);
 
 CREATE POLICY profiles_public_or_owner_read ON profiles.profiles
     FOR SELECT USING (
@@ -106,9 +108,10 @@ CREATE POLICY profiles_owner_update ON profiles.profiles
         account_id = nullif(current_setting('minx.account_id', true), '')::uuid
     );
 
-CREATE POLICY organisations_member_read ON organisations.organisations
+CREATE POLICY organisations_member_or_creator_read ON organisations.organisations
     FOR SELECT USING (
-        EXISTS (
+        created_by = nullif(current_setting('minx.account_id', true), '')::uuid
+        OR EXISTS (
             SELECT 1 FROM organisations.memberships m
             WHERE m.organisation_id = organisations.organisations.id
               AND m.account_id = nullif(current_setting('minx.account_id', true), '')::uuid
@@ -119,29 +122,84 @@ CREATE POLICY organisations_creator_insert ON organisations.organisations
     FOR INSERT WITH CHECK (
         created_by = nullif(current_setting('minx.account_id', true), '')::uuid
     );
+CREATE POLICY organisations_creator_update ON organisations.organisations
+    FOR UPDATE USING (
+        created_by = nullif(current_setting('minx.account_id', true), '')::uuid
+    ) WITH CHECK (
+        created_by = nullif(current_setting('minx.account_id', true), '')::uuid
+    );
 
-CREATE POLICY organisation_roles_member_read ON organisations.roles
+CREATE POLICY organisation_roles_member_or_creator_read ON organisations.roles
     FOR SELECT USING (
         EXISTS (
+            SELECT 1 FROM organisations.organisations o
+            WHERE o.id = roles.organisation_id
+              AND o.created_by = nullif(current_setting('minx.account_id', true), '')::uuid
+        )
+        OR EXISTS (
             SELECT 1 FROM organisations.memberships m
             WHERE m.organisation_id = roles.organisation_id
               AND m.account_id = nullif(current_setting('minx.account_id', true), '')::uuid
               AND m.status = 'ACTIVE'
         )
     );
+CREATE POLICY organisation_roles_creator_insert ON organisations.roles
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM organisations.organisations o
+            WHERE o.id = roles.organisation_id
+              AND o.created_by = nullif(current_setting('minx.account_id', true), '')::uuid
+        )
+    );
+
 CREATE POLICY memberships_self_read ON organisations.memberships
     FOR SELECT USING (
         account_id = nullif(current_setting('minx.account_id', true), '')::uuid
     );
-CREATE POLICY memberships_self_insert ON organisations.memberships
+CREATE POLICY memberships_creator_self_insert ON organisations.memberships
     FOR INSERT WITH CHECK (
         account_id = nullif(current_setting('minx.account_id', true), '')::uuid
+        AND EXISTS (
+            SELECT 1 FROM organisations.organisations o
+            WHERE o.id = memberships.organisation_id
+              AND o.created_by = nullif(current_setting('minx.account_id', true), '')::uuid
+        )
     );
 
 CREATE POLICY profile_operators_owner_or_self_read ON profiles.operators
     FOR SELECT USING (
         account_id = nullif(current_setting('minx.account_id', true), '')::uuid
         OR EXISTS (
+            SELECT 1 FROM profiles.profiles p
+            WHERE p.id = operators.profile_id
+              AND p.account_id = nullif(current_setting('minx.account_id', true), '')::uuid
+        )
+    );
+CREATE POLICY profile_operators_owner_insert ON profiles.operators
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM profiles.profiles p
+            WHERE p.id = operators.profile_id
+              AND p.account_id = nullif(current_setting('minx.account_id', true), '')::uuid
+        )
+    );
+CREATE POLICY profile_operators_owner_update ON profiles.operators
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM profiles.profiles p
+            WHERE p.id = operators.profile_id
+              AND p.account_id = nullif(current_setting('minx.account_id', true), '')::uuid
+        )
+    ) WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM profiles.profiles p
+            WHERE p.id = operators.profile_id
+              AND p.account_id = nullif(current_setting('minx.account_id', true), '')::uuid
+        )
+    );
+CREATE POLICY profile_operators_owner_delete ON profiles.operators
+    FOR DELETE USING (
+        EXISTS (
             SELECT 1 FROM profiles.profiles p
             WHERE p.id = operators.profile_id
               AND p.account_id = nullif(current_setting('minx.account_id', true), '')::uuid
