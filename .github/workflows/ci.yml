@@ -56,7 +56,11 @@ jobs:
           psql -h localhost -U postgres -d minx_test -v ON_ERROR_STOP=1 \
             -f services/core/db/tests/rls_smoke.sql
       - name: Install sqlc
-        run: go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.31.1
+        run: |
+          curl -fsSL https://github.com/sqlc-dev/sqlc/releases/download/v1.31.1/sqlc_1.31.1_linux_amd64.tar.gz -o /tmp/sqlc.tar.gz
+          echo '497ae4fcdfa64c5b0c311ffe4c2bd991e43991e82e5367792ed78bc2dca27354  /tmp/sqlc.tar.gz' | sha256sum --check
+          tar -xzf /tmp/sqlc.tar.gz -C /tmp sqlc
+          sudo install /tmp/sqlc /usr/local/bin/sqlc
       - name: Generate Core database bindings
         working-directory: services/core
         run: sqlc generate
