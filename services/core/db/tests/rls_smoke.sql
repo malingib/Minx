@@ -41,8 +41,15 @@ SET LOCAL minx.account_id = '10000000-0000-4000-8000-000000000002';
 INSERT INTO identity.accounts (id, auth_subject)
 VALUES ('10000000-0000-4000-8000-000000000002', 'issuer|subject-b');
 
-DO $$
+DO $
 BEGIN
+    BEGIN
+        INSERT INTO profiles.profiles (account_id, handle, display_name, profile_type, visibility)
+        VALUES ('10000000-0000-4000-8000-000000000001', 'spoofed_a', 'Spoofed', 'PERSONAL', 'PUBLIC');
+        RAISE EXCEPTION 'cross-account profile insert unexpectedly succeeded';
+    EXCEPTION WHEN insufficient_privilege THEN
+        NULL;
+    END;
     IF (SELECT count(*) FROM profiles.profiles WHERE handle = 'creator_a') <> 1 THEN
         RAISE EXCEPTION 'public profile should be visible to another account';
     END IF;
