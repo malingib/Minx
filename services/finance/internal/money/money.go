@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	ErrInvalidCurrency = errors.New("currency must be a three-letter uppercase code")
+	ErrInvalidCurrency  = errors.New("currency must be a three-letter uppercase code")
 	ErrCurrencyMismatch = errors.New("currency mismatch")
-	ErrAmountOverflow = errors.New("amount overflow")
+	ErrAmountOverflow   = errors.New("amount overflow")
 )
 
 // Amount stores money in integer minor units; it never uses floating point.
