@@ -38,7 +38,7 @@ jobs:
         run: |
           cd services/core
           go mod tidy
-          cat go.sum
+          git diff --exit-code -- go.mod go.sum
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update
